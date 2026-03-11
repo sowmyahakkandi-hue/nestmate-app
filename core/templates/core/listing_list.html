@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Browse Listings — NestMate{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Browse Rooms</h1>
+    <a href="{% url 'listing_create' %}" class="btn btn-primary">Post a Room</a>
+</div>
+
+<form method="get" class="search-bar">
+    <div class="form-group"><label>Search</label><input type="text" name="q" value="{{ query }}" placeholder="Title, description..."></div>
+    <div class="form-group"><label>City</label><input type="text" name="city" value="{{ city }}" placeholder="Dublin, Cork..."></div>
+    <div class="form-group">
+        <label>Type</label>
+        <select name="property_type">
+            <option value="">All Types</option>
+            {% for val, label in property_types %}<option value="{{ val }}" {% if property_type == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="form-group"><label>Max Rent (€/mo)</label><input type="number" name="max_rent" value="{{ max_rent }}" placeholder="e.g. 900"></div>
+    <button type="submit" class="btn btn-primary">Search</button>
+    {% if query or city or property_type or max_rent %}<a href="{% url 'listing_list' %}" class="btn btn-secondary">Clear</a>{% endif %}
+</form>
+
+{% if listings %}
+<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">{{ listings.count }} listing{{ listings.count|pluralize }} found</p>
+<div class="grid-2">
+    {% for listing in listings %}
+    <a href="{% url 'listing_detail' listing.pk %}" class="listing-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+            <div>
+                <h3>{{ listing.title }}</h3>
+                <div style="color:var(--text-muted);font-size:0.82rem;margin-top:0.25rem;">{{ listing.address|truncatechars:40 }}, {{ listing.city }}</div>
+            </div>
+            <div style="text-align:right;">
+                <div class="listing-price">€{{ listing.rent_per_month }}<span>/mo</span></div>
+                <span class="badge badge-{{ listing.status }}">{{ listing.get_status_display }}</span>
+            </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0.5rem 0 0.75rem;">{{ listing.description|truncatechars:120 }}</p>
+        <div class="listing-meta">
+            <span>{{ listing.bedrooms }} bed</span>
+            <span>{{ listing.bathrooms }} bath</span>
+            <span>{{ listing.max_occupants }} max</span>
+            {% if listing.wifi_included %}<span>WiFi</span>{% endif %}
+            {% if listing.bills_included %}<span>Bills incl.</span>{% endif %}
+        </div>
+        <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">
+            Posted by {{ listing.owner.get_full_name|default:listing.owner.username }} &middot; Available from {{ listing.available_from }}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No listings found</h3>
+    <p>Try adjusting your search filters.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}{{ listing.title }} — NestMate{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:1rem;">
+    <a href="{% url 'listing_list' %}" style="color:var(--text-muted);text-decoration:none;font-size:0.85rem;">&larr; Back to listings</a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+    <div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <div>
+                <span class="badge badge-{{ listing.status }}" style="margin-bottom:0.5rem;display:inline-block;">{{ listing.get_status_display }}</span>
+                <h1 style="font-size:1.8rem;font-weight:800;">{{ listing.title }}</h1>
+                <p style="color:var(--text-muted);margin-top:0.3rem;">{{ listing.address }}, {{ listing.city }}</p>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:2rem;font-weight:800;color:var(--accent);">€{{ listing.rent_per_month }}</div>
+                <div style="color:var(--text-muted);font-size:0.85rem;">per month</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-weight:700;margin-bottom:0.75rem;">About this property</h3>
+            <p style="color:var(--text-muted);line-height:1.7;">{{ listing.description }}</p>
+        </div>
+
+        <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-weight:700;margin-bottom:1rem;">Property Details</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;">
+                <div style="padding:0.75rem;background:var(--surface2);border-radius:var(--radius-sm);">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">Type</div>
+                    <div style="font-weight:600;">{{ listing.get_property_type_display }}</div>
+                </div>
+                <div style="padding:0.75rem;background:var(--surface2);border-radius:var(--radius-sm);">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">Bedrooms</div>
+                    <div style="font-weight:600;">{{ listing.bedrooms }}</div>
+                </div>
+                <div style="padding:0.75rem;background:var(--surface2);border-radius:var(--radius-sm);">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">Bathrooms</div>
+                    <div style="font-weight:600;">{{ listing.bathrooms }}</div>
+                </div>
+                <div style="padding:0.75rem;background:var(--surface2);border-radius:var(--radius-sm);">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">Max Occupants</div>
+                    <div style="font-weight:600;">{{ listing.max_occupants }}</div>
+                </div>
+                <div style="padding:0.75rem;background:var(--surface2);border-radius:var(--radius-sm);">
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">Available From</div>
+                    <div style="font-weight:600;">{{ listing.available_from }}</div>
+                </div>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                {% if listing.wifi_included %}<span class="badge badge-available">WiFi Included</span>{% endif %}
+                {% if listing.bills_included %}<span class="badge badge-available">Bills Included</span>{% endif %}
+                {% if listing.pets_allowed %}<span class="badge badge-pending">Pets Allowed</span>{% endif %}
+                {% if listing.smoking_allowed %}<span class="badge badge-pending">Smoking Allowed</span>{% endif %}
+            </div>
+        </div>
+
+        {% if user == listing.owner and requests %}
+        <div class="card">
+            <h3 style="font-weight:700;margin-bottom:1rem;">Roommate Requests ({{ requests.count }})</h3>
+            {% for req in requests %}
+            <div style="padding:1rem;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:0.75rem;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <strong>{{ req.sender.get_full_name|default:req.sender.username }}</strong>
+                        <span class="badge badge-{{ req.status }}" style="margin-left:0.5rem;">{{ req.get_status_display }}</span>
+                    </div>
+                    <span style="font-size:0.78rem;color:var(--text-muted);">{{ req.created_at|date:"M d, Y" }}</span>
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin:0.5rem 0;">{{ req.message }}</p>
+                {% if req.status == 'pending' %}
+                <div style="display:flex;gap:0.5rem;">
+                    <form method="post" action="{% url 'request_update_status' req.pk %}" style="display:inline;">
+                        {% csrf_token %}<input type="hidden" name="status" value="accepted">
+                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                    </form>
+                    <form method="post" action="{% url 'request_update_status' req.pk %}" style="display:inline;">
+                        {% csrf_token %}<input type="hidden" name="status" value="rejected">
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="position:sticky;top:80px;">
+        <div class="card" style="margin-bottom:1rem;">
+            <h4 style="font-weight:700;margin-bottom:1rem;">Listed by</h4>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;">
+                    {{ listing.owner.first_name.0|default:listing.owner.username.0|upper }}
+                </div>
+                <div>
+                    <div style="font-weight:600;">{{ listing.owner.get_full_name|default:listing.owner.username }}</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">Member since {{ listing.owner.date_joined|date:"Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if user == listing.owner %}
+        <div class="card">
+            <h4 style="font-weight:700;margin-bottom:1rem;">Manage Listing</h4>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <a href="{% url 'listing_edit' listing.pk %}" class="btn btn-secondary">Edit Listing</a>
+                <a href="{% url 'listing_delete' listing.pk %}" class="btn btn-danger">Delete Listing</a>
+            </div>
+        </div>
+        {% elif listing.status == 'available' %}
+        <div class="card">
+            {% if existing_request %}
+                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.75rem;">You already sent a request.</p>
+                <span class="badge badge-{{ existing_request.status }}">Status: {{ existing_request.get_status_display }}</span>
+                {% if existing_request.status == 'pending' %}
+                <form method="post" action="{% url 'request_withdraw' existing_request.pk %}" style="margin-top:0.75rem;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Withdraw Request</button>
+                </form>
+                {% endif %}
+            {% else %}
+                <h4 style="font-weight:700;margin-bottom:0.5rem;">Interested?</h4>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">Send a roommate request to {{ listing.owner.first_name|default:listing.owner.username }}.</p>
+                <a href="{% url 'request_create' listing.pk %}" class="btn btn-primary" style="width:100%;justify-content:center;">Send Request</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div style="margin-top:1rem;font-size:0.78rem;color:var(--text-muted);text-align:center;">Posted {{ listing.created_at|date:"M d, Y" }}</div>
+    </div>
+</div>
+{% endblock %}

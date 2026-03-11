@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NestMate — Student Accommodation Finder{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1c1c27;
+            --border: #2a2a3a;
+            --accent: #7c6aff;
+            --accent2: #ff6a9b;
+            --accent3: #6affca;
+            --text: #e8e8f0;
+            --text-muted: #7a7a9a;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* NAV */
+        nav {
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand span { color: var(--accent); }
+
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); background: var(--surface2); }
+        .nav-links a.active { color: var(--accent); background: rgba(124,106,255,0.1); }
+
+        .btn-nav {
+            background: var(--accent) !important;
+            color: white !important;
+            padding: 0.4rem 1rem !important;
+            border-radius: 20px !important;
+        }
+
+        .btn-nav:hover { background: #6a58e8 !important; }
+
+        /* MAIN */
+        main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.2rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #6a58e8; transform: translateY(-1px); }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+        .btn-danger:hover { background: rgba(248,113,113,0.25); }
+        .btn-success { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.3); }
+        .btn-success:hover { background: rgba(74,222,128,0.25); }
+        .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.82rem; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 0.9rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124,106,255,0.15);
+        }
+
+        .form-group select option { background: var(--surface2); }
+        .form-check { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .form-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
+        .form-check label { font-size: 0.9rem; color: var(--text); cursor: pointer; margin: 0; text-transform: none; letter-spacing: 0; }
+
+        .errorlist { list-style: none; }
+        .errorlist li { color: var(--danger); font-size: 0.82rem; margin-top: 0.3rem; }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-available { background: rgba(74,222,128,0.15); color: var(--success); }
+        .badge-pending { background: rgba(251,191,36,0.15); color: var(--warning); }
+        .badge-taken { background: rgba(248,113,113,0.15); color: var(--danger); }
+        .badge-accepted { background: rgba(74,222,128,0.15); color: var(--success); }
+        .badge-rejected { background: rgba(248,113,113,0.15); color: var(--danger); }
+        .badge-withdrawn { background: rgba(122,122,154,0.15); color: var(--text-muted); }
+
+        /* ALERTS */
+        .messages { list-style: none; margin-bottom: 1.5rem; }
+        .messages li {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            border-left: 3px solid;
+        }
+
+        .messages .success { background: rgba(74,222,128,0.1); border-color: var(--success); color: var(--success); }
+        .messages .error { background: rgba(248,113,113,0.1); border-color: var(--danger); color: var(--danger); }
+        .messages .warning { background: rgba(251,191,36,0.1); border-color: var(--warning); color: var(--warning); }
+        .messages .info { background: rgba(124,106,255,0.1); border-color: var(--accent); color: var(--accent); }
+
+        /* PAGE HEADER */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* GRID */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+
+        /* STAT CARD */
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-card .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .stat-card .stat-value { font-size: 2rem; font-weight: 700; }
+
+        /* LISTING CARD */
+        .listing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text);
+            display: block;
+        }
+
+        .listing-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(124,106,255,0.15); }
+        .listing-card h3 { font-size: 1rem; font-weight: 700; }
+        .listing-price { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+        .listing-price span { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+        .listing-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 0.75rem 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+        td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(42,42,58,0.5); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(124,106,255,0.04); }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+        .empty-state h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.5rem; }
+
+        /* DIVIDER */
+        hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .search-bar .form-group { margin-bottom: 0; flex: 1; min-width: 140px; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (max-width: 768px) {
+            main { padding: 1rem; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            nav { padding: 0 1rem; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{% url 'dashboard' %}" class="nav-brand">Nest<span>Mate</span></a>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'listing_list' %}">Browse</a>
+                <a href="{% url 'my_listings' %}">My Listings</a>
+                <a href="{% url 'my_requests' %}">Requests</a>
+                <a href="{% url 'profile_view' %}">Profile</a>
+                <a href="{% url 'listing_create' %}" class="btn-nav">Post a Room</a>
+                <a href="{% url 'logout' %}" style="color:var(--text-muted); font-size:0.82rem;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}" class="btn-nav">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        NestMate &copy; 2025 — Student Accommodation &amp; Roommate Finder
+    </footer>
+</body>
+</html>

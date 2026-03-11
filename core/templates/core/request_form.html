@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Send Request — NestMate{% endblock %}
+{% block content %}
+<div style="max-width:560px;margin:0 auto;">
+    <a href="{% url 'listing_detail' listing.pk %}" style="color:var(--text-muted);text-decoration:none;font-size:0.85rem;">&larr; Back to listing</a>
+    <h1 style="font-size:1.6rem;font-weight:800;margin:1rem 0 0.25rem;">Send Roommate Request</h1>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem;">For: <strong style="color:var(--text);">{{ listing.title }}</strong> &mdash; €{{ listing.rent_per_month }}/mo</p>
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Your Message *</label>
+                {{ form.message }}{{ form.message.errors }}
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.3rem;">Introduce yourself and explain why you are a good fit. Minimum 20 characters.</div>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
+                <button type="submit" class="btn btn-primary">Send Request</button>
+                <a href="{% url 'listing_detail' listing.pk %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

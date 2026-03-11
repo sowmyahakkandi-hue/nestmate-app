@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Listing — NestMate{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:0 auto;">
+    <div style="margin-bottom:1.5rem;"><a href="{% url 'my_listings' %}" style="color:var(--text-muted);text-decoration:none;font-size:0.85rem;">&larr; Back to my listings</a></div>
+    <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:1.5rem;">{{ action }} Listing</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-weight:700;margin-bottom:1rem;">Basic Information</h3>
+            <div class="form-group"><label>Title *</label>{{ form.title }}{{ form.title.errors }}</div>
+            <div class="form-group"><label>Description *</label>{{ form.description }}{{ form.description.errors }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group"><label>Property Type *</label>{{ form.property_type }}{{ form.property_type.errors }}</div>
+                <div class="form-group"><label>Status *</label>{{ form.status }}{{ form.status.errors }}</div>
+            </div>
+        </div>
+        <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-weight:700;margin-bottom:1rem;">Location &amp; Price</h3>
+            <div class="form-group"><label>Address *</label>{{ form.address }}{{ form.address.errors }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group"><label>City *</label>{{ form.city }}{{ form.city.errors }}</div>
+                <div class="form-group"><label>Rent Per Month (€) *</label>{{ form.rent_per_month }}{{ form.rent_per_month.errors }}</div>
+            </div>
+            <div class="form-group"><label>Available From *</label>{{ form.available_from }}{{ form.available_from.errors }}</div>
+        </div>
+        <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-weight:700;margin-bottom:1rem;">Room Details</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                <div class="form-group"><label>Bedrooms *</label>{{ form.bedrooms }}{{ form.bedrooms.errors }}</div>
+                <div class="form-group"><label>Bathrooms *</label>{{ form.bathrooms }}{{ form.bathrooms.errors }}</div>
+                <div class="form-group"><label>Max Occupants *</label>{{ form.max_occupants }}{{ form.max_occupants.errors }}</div>
+            </div>
+            <h4 style="font-weight:700;margin:1rem 0 0.75rem;font-size:0.95rem;">Amenities &amp; Rules</h4>
+            <div class="form-check">{{ form.wifi_included }}<label>WiFi Included</label></div>
+            <div class="form-check">{{ form.bills_included }}<label>Bills Included</label></div>
+            <div class="form-check">{{ form.pets_allowed }}<label>Pets Allowed</label></div>
+            <div class="form-check">{{ form.smoking_allowed }}<label>Smoking Allowed</label></div>
+            {% if form.non_field_errors %}<div style="color:var(--danger);font-size:0.85rem;margin-top:0.5rem;">{{ form.non_field_errors }}</div>{% endif %}
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+            <button type="submit" class="btn btn-primary">{{ action }} Listing</button>
+            <a href="{% url 'my_listings' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

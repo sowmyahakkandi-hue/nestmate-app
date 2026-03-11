@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Register — NestMate{% endblock %}
+{% block content %}
+<div style="max-width:480px;margin:3rem auto;">
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h1 style="font-size:1.8rem;font-weight:800;">Create an account</h1>
+        <p style="color:var(--text-muted);">Join NestMate to find your perfect room</p>
+    </div>
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group"><label>First Name *</label>{{ form.first_name }}{{ form.first_name.errors }}</div>
+                <div class="form-group"><label>Last Name *</label>{{ form.last_name }}{{ form.last_name.errors }}</div>
+            </div>
+            <div class="form-group"><label>Username *</label>{{ form.username }}{{ form.username.errors }}</div>
+            <div class="form-group"><label>Email *</label>{{ form.email }}{{ form.email.errors }}</div>
+            <div class="form-group"><label>Password *</label>{{ form.password1 }}{{ form.password1.errors }}</div>
+            <div class="form-group"><label>Confirm Password *</label>{{ form.password2 }}{{ form.password2.errors }}</div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">Create Account</button>
+        </form>
+    </div>
+    <p style="text-align:center;margin-top:1.25rem;color:var(--text-muted);font-size:0.9rem;">
+        Already have an account? <a href="{% url 'login' %}" style="color:var(--accent);">Sign in</a>
+    </p>
+</div>
+{% endblock %}

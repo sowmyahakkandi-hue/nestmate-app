@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — NestMate{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:2.5rem;">
+    <h1 style="font-size:2rem; font-weight:800; margin-bottom:0.4rem;">
+        Welcome back, <span class="gradient-text">{{ user.first_name|default:user.username }}</span>
+    </h1>
+    <p style="color:var(--text-muted);">Find your perfect student accommodation or a great roommate.</p>
+</div>
+
+<div class="grid-4" style="margin-bottom:2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Available Rooms</div>
+        <div class="stat-value" style="color:var(--accent);">{{ total_listings }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">My Listings</div>
+        <div class="stat-value">{{ my_listings }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">My Requests</div>
+        <div class="stat-value">{{ my_requests }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending Inbox</div>
+        <div class="stat-value" style="color:var(--warning);">{{ pending_requests }}</div>
+    </div>
+</div>
+
+<div class="page-header">
+    <h2 style="font-size:1.3rem; font-weight:700;">Recent Listings</h2>
+    <div style="display:flex;gap:0.75rem;">
+        <a href="{% url 'listing_list' %}" class="btn btn-secondary btn-sm">View All</a>
+        <a href="{% url 'listing_create' %}" class="btn btn-primary btn-sm">Post a Room</a>
+    </div>
+</div>
+
+{% if listings %}
+<div class="grid-2">
+    {% for listing in listings %}
+    <a href="{% url 'listing_detail' listing.pk %}" class="listing-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+            <div>
+                <h3>{{ listing.title }}</h3>
+                <div style="color:var(--text-muted);font-size:0.82rem;margin-top:0.25rem;">{{ listing.city }}</div>
+            </div>
+            <div style="text-align:right;">
+                <div class="listing-price">€{{ listing.rent_per_month }}<span>/mo</span></div>
+                <span class="badge badge-{{ listing.status }}">{{ listing.get_status_display }}</span>
+            </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">{{ listing.description|truncatechars:100 }}</p>
+        <div class="listing-meta">
+            <span>{{ listing.bedrooms }} bed</span>
+            <span>{{ listing.bathrooms }} bath</span>
+            <span>{{ listing.max_occupants }} max</span>
+            {% if listing.wifi_included %}<span>WiFi</span>{% endif %}
+            {% if listing.bills_included %}<span>Bills incl.</span>{% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No listings yet</h3>
+    <p>Be the first to post a room.</p>
+    <a href="{% url 'listing_create' %}" class="btn btn-primary" style="margin-top:1rem;">Post a Room</a>
+</div>
+{% endif %}
+
+{% endblock %}

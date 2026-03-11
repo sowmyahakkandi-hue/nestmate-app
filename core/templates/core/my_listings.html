@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}My Listings — NestMate{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>My Listings</h1>
+    <a href="{% url 'listing_create' %}" class="btn btn-primary">Post New Room</a>
+</div>
+{% if listings %}
+<div class="card" style="padding:0;overflow:hidden;">
+    <table>
+        <thead><tr><th>Title</th><th>City</th><th>Rent</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for listing in listings %}
+            <tr>
+                <td><strong>{{ listing.title }}</strong></td>
+                <td style="color:var(--text-muted);">{{ listing.city }}</td>
+                <td style="color:var(--accent);font-weight:600;">€{{ listing.rent_per_month }}/mo</td>
+                <td><span class="badge badge-{{ listing.status }}">{{ listing.get_status_display }}</span></td>
+                <td style="color:var(--text-muted);font-size:0.82rem;">{{ listing.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <div style="display:flex;gap:0.5rem;">
+                        <a href="{% url 'listing_detail' listing.pk %}" class="btn btn-secondary btn-sm">View</a>
+                        <a href="{% url 'listing_edit' listing.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                        <a href="{% url 'listing_delete' listing.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No listings yet</h3>
+    <p>Post your first room to get started.</p>
+    <a href="{% url 'listing_create' %}" class="btn btn-primary" style="margin-top:1rem;">Post a Room</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Profile — NestMate{% endblock %}
+{% block content %}
+<div style="max-width:600px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.6rem;color:white;flex-shrink:0;">
+            {{ profile.user.first_name.0|default:profile.user.username.0|upper }}
+        </div>
+        <div>
+            <h1 style="font-size:1.5rem;font-weight:800;">{{ profile.user.get_full_name|default:profile.user.username }}</h1>
+            <p style="color:var(--text-muted);">{{ profile.user.email }}</p>
+        </div>
+        {% if profile.user == user %}
+        <a href="{% url 'profile_edit' %}" class="btn btn-secondary btn-sm" style="margin-left:auto;">Edit Profile</a>
+        {% endif %}
+    </div>
+    <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div><div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">College</div><div style="font-weight:500;margin-top:0.2rem;">{{ profile.college|default:"Not set" }}</div></div>
+            <div><div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Course</div><div style="font-weight:500;margin-top:0.2rem;">{{ profile.get_course_display }}</div></div>
+            <div><div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Phone</div><div style="font-weight:500;margin-top:0.2rem;">{{ profile.phone|default:"Not set" }}</div></div>
+            <div><div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Member Since</div><div style="font-weight:500;margin-top:0.2rem;">{{ profile.user.date_joined|date:"M Y" }}</div></div>
+        </div>
+        {% if profile.bio %}<hr><div style="margin-top:1rem;"><div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">About</div><p style="color:var(--text-muted);line-height:1.7;">{{ profile.bio }}</p></div>{% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Requests — NestMate{% endblock %}
+{% block content %}
+<h1 style="font-size:1.8rem;font-weight:800;margin-bottom:1.5rem;">Roommate Requests</h1>
+
+<h2 style="font-size:1.1rem;color:var(--text-muted);margin-bottom:1rem;">Sent by me</h2>
+{% if sent %}
+<div class="card" style="padding:0;overflow:hidden;margin-bottom:2rem;">
+    <table>
+        <thead><tr><th>Listing</th><th>Message</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>
+            {% for req in sent %}
+            <tr>
+                <td><a href="{% url 'listing_detail' req.listing.pk %}" style="color:var(--accent);text-decoration:none;">{{ req.listing.title }}</a></td>
+                <td style="color:var(--text-muted);font-size:0.85rem;">{{ req.message|truncatechars:60 }}</td>
+                <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                <td style="color:var(--text-muted);font-size:0.82rem;">{{ req.created_at|date:"M d, Y" }}</td>
+                <td>
+                    {% if req.status == 'pending' %}
+                    <form method="post" action="{% url 'request_withdraw' req.pk %}">
+                        {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm">Withdraw</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state" style="padding:2rem;">
+    <p>You have not sent any requests yet.</p>
+    <a href="{% url 'listing_list' %}" class="btn btn-primary" style="margin-top:1rem;">Browse Listings</a>
+</div>
+{% endif %}
+
+<h2 style="font-size:1.1rem;color:var(--text-muted);margin-bottom:1rem;">Received for my listings</h2>
+{% if received %}
+<div class="card" style="padding:0;overflow:hidden;">
+    <table>
+        <thead><tr><th>From</th><th>Listing</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for req in received %}
+            <tr>
+                <td><strong>{{ req.sender.get_full_name|default:req.sender.username }}</strong></td>
+                <td style="color:var(--text-muted);">{{ req.listing.title }}</td>
+                <td style="color:var(--text-muted);font-size:0.85rem;">{{ req.message|truncatechars:60 }}</td>
+                <td><span class="badge badge-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                <td>
+                    {% if req.status == 'pending' %}
+                    <div style="display:flex;gap:0.4rem;">
+                        <form method="post" action="{% url 'request_update_status' req.pk %}">
+                            {% csrf_token %}<input type="hidden" name="status" value="accepted">
+                            <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                        </form>
+                        <form method="post" action="{% url 'request_update_status' req.pk %}">
+                            {% csrf_token %}<input type="hidden" name="status" value="rejected">
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state" style="padding:2rem;"><p>No requests received yet.</p></div>
+{% endif %}
+{% endblock %}
