@@ -7,6 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
+  # ─────────────────────────────────────────
+  # CI: Static Analysis & Tests
+  # ─────────────────────────────────────────
   ci:
     name: CI — Lint, Test & Static Analysis
     runs-on: ubuntu-latest
@@ -14,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -34,11 +39,13 @@ jobs:
           pip install -r requirements.txt
           pip install bandit flake8 coverage
 
+      # ── Static Code Analysis: Flake8 ──
       - name: Flake8 — Style & Syntax Check
         run: |
           flake8 . --count --max-line-length=120 --exclude=migrations,venv --statistics
         continue-on-error: true
 
+      # ── Security Vulnerability Analysis: Bandit ──
       - name: Bandit — Security Vulnerability Scan
         run: |
           bandit -r . -x ./venv,./migrations -f json -o bandit-report.json || true
@@ -51,6 +58,7 @@ jobs:
           name: bandit-security-report
           path: bandit-report.json
 
+      # ── Django Tests ──
       - name: Run Django Tests
         env:
           DJANGO_SECRET_KEY: test-secret-key-for-ci
@@ -75,6 +83,23 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
+      # ── SonarQube Scan ──
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=sowmyahakkandi-hue_nestmate-app
+            -Dsonar.organization=sowmyahakkandi-hue
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/migrations/**,**/venv/**,**/__pycache__/**
+            -Dsonar.python.version=3.11
+
+  # ─────────────────────────────────────────
+  # CD: Deploy to EC2 (main branch only)
+  # ─────────────────────────────────────────
   cd:
     name: CD — Deploy to EC2
     runs-on: ubuntu-latest
