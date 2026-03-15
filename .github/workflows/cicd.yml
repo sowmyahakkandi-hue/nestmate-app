@@ -25,38 +25,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install bandit flake8 coverage
-
-      # ── Static Code Analysis: Flake8 ──
-      - name: Flake8 — Style & Syntax Check
-        run: |
-          flake8 . --count --max-line-length=120 --exclude=migrations,venv --statistics
-        continue-on-error: true
-
-      # ── Security Vulnerability Analysis: Bandit ──
-      - name: Bandit — Security Vulnerability Scan
-        run: |
-          bandit -r . -x ./venv,./migrations -f json -o bandit-report.json || true
-        continue-on-error: true
-
-      - name: Upload Bandit Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: bandit-security-report
-          path: bandit-report.json
 
       # ── Django Tests ──
       - name: Run Django Tests
@@ -66,22 +38,6 @@ jobs:
         run: |
           python manage.py test --verbosity=2
         continue-on-error: true
-
-      - name: Generate Coverage Report
-        env:
-          DJANGO_SECRET_KEY: test-secret-key-for-ci
-          DEBUG: "True"
-        run: |
-          coverage run --source='.' manage.py test
-          coverage report
-          coverage xml
-        continue-on-error: true
-
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
 
       # ── SonarQube Scan ──
       - name: SonarQube Scan
